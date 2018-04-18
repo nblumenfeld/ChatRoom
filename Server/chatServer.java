@@ -14,22 +14,27 @@ import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
 
+
 public class chatServer {
 
     public static final int DEFAULT_PORT = 1134;
 
     //thread pool
-    private static final Executor execute = Executor.newCachedThreadPool();
+    private static final Executor execute = Executors.newCachedThreadPool();
+
 
     public static void main(String[] args) throws IOException {
+     
         ServerSocket server = null;
-        
+
         try{
             server = new ServerSocket(DEFAULT_PORT); 
 
             while(true){
+            
                 Runnable mission = new Connection(server.accept());
                 execute.execute(mission);
+
             }
 
         }
