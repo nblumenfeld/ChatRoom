@@ -8,7 +8,7 @@
 import java.net.*;
 import java.io.*;
 
-public class EchoClient
+public class Client
 {
 	public static final int DEFAULT_PORT = 1134;
 	
