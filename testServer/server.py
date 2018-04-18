@@ -1,6 +1,7 @@
 import sys
 import socket
 import select
+import json
 
 HOST = '' 
 SOCKET_LIST = []
@@ -42,7 +43,9 @@ def chat_server():
                     data = sock.recv(RECV_BUFFER)
                     if data:
                         # there is something in the socket
-                        broadcast(server_socket, sock, "\r" + '[' + str(sock.getpeername()) + '] ' + data)  
+                        print data
+                        data = json.loads(data)
+                        print data["message"]
                     else:
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
@@ -64,7 +67,7 @@ def broadcast (server_socket, sock, message):
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
-                socket.send(message)
+                print message
             except :
                 # broken socket connection
                 socket.close()
