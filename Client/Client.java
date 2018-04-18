@@ -1,8 +1,8 @@
 /**
- * An echo client. The client enters data to the server, and the
- * server echoes the data back to the client.
+ * A client for the Protocol.
  *
- * @author - Greg Gagne
+ * author:  Noah Blumenfeld and Thomas Eliassan
+ *
  */
 
 import java.net.*;
@@ -10,7 +10,7 @@ import java.io.*;
 
 public class EchoClient
 {
-	public static final int DEFAULT_PORT = 6007;
+	public static final int DEFAULT_PORT = 1134;
 	
 	public static void main(String[] args) throws IOException {
 		if (args.length != 1) {
