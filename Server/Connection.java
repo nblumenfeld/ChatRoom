@@ -9,6 +9,7 @@
 
 import java.net.*;
 import java.io.*;
+import org.json;
 
 public class Connection implements Runnable
 {
@@ -26,42 +27,16 @@ public class Connection implements Runnable
 		try {
 
 			byte[] buffer = new byte[BUFFER_SIZE];
-			InputStream is = null;
+			BufferedReader is = null;
 			OutputStream os = null;
-
-			InetAddress host;
 
 			try{
 
-				is = new BufferedInputStream(client.getInputStream());
+				is = new BufferedReader(new InputStream(client.getInputStream()));
 				os = new BufferedOutputStream(client.getOutputStream());
-				int numBytes = is.read(buffer);
 				
-				while (numBytes != -1){
-					String user = new String(buffer).trim();
-					try{
-						host =  InetAddress.getByName(user);
-						String hostString = host.getHostAddress() + "\n";
-						os.write(hostString.getBytes());
-						os.flush();
-						is.close();
-
-					}
-					catch(UnknownHostException uhe){
-						String feil = "Unknown host: " + user + "\n";
-						os.write(feil.getBytes());
-						os.flush();
-						is.close();
-					}
-					finally {
-						// close streams and socket
-						if (is != null)
-							is.close();
-						if (os != null)
-							os.close();
-					}
-				}
-
+				Strin
+				
 			}
 			catch (Exception e){
 				System.err.println(e);
