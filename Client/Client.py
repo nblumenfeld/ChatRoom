@@ -5,7 +5,7 @@ import sys
 import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.connect(('localhost',1134))
+server.connect(('146.86.79.28',1134))
 
 while True:
 
