@@ -26,6 +26,7 @@ def chat_server():
         ready_to_read,ready_to_write,in_error = select.select(SOCKET_LIST,[],[],0)
       
         for sock in ready_to_read:
+            
             # a new connection request recieved
             if sock == server_socket: 
                 sockfd, addr = server_socket.accept()
