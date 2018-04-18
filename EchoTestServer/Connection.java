@@ -37,7 +37,7 @@ public class Connection implements Runnable
 				os = new BufferedOutputStream(client.getOutputStream());
 				int numBytes = is.read(buffer);
 				
-				while (numBytes != -1){
+				while (true){
 					String user = new String(buffer).trim();
 					try{
 						host =  InetAddress.getByName(user);
@@ -48,8 +48,8 @@ public class Connection implements Runnable
 
 					}
 					catch(UnknownHostException uhe){
-						String feil = "Unknown host: " + user + "\n";
-						os.write(feil.getBytes());
+						String fail = "Unknown host: " + user + "\n";
+						os.write(fail.getBytes());
 						os.flush();
 						is.close();
 					}
