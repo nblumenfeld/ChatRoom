@@ -46,6 +46,7 @@ def chat_server():
                         print data
                         data = json.loads(data)
                         print data["message"]
+                        broadcast(server_socket,sock,data["message"])
                     else:
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
