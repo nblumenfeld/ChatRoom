@@ -10,6 +10,7 @@ RECV_BUFFER = 4096
 PORT = 1134
 # a list of tuples with socetfd and username
 connectedUser = []
+maxUsers = 10
 
 def chat_server():
 
@@ -63,8 +64,14 @@ def chat_server():
                             sock.send(json.dumps({"isConnected":True}))
                             broadcast(server_socket,sock,"User %s has connected\n" %data["username"])
                         elif("disconect" in data):
-                            sock.send(json.dumps({"isConnected":True}))
-                            sock.close()
+                            if data["disconnect"] == True:
+                                sock.send(json.dumps({"isConnected":True}))
+                                # remove from usernameList
+                                if sock in connectedUser[0]:
+                                    remObject = [i for i in connectedUser if i[0] == sock]
+                                    remObject = remObject[0]
+                                    connectedUser.remove(remObject)
+                                sock.close()
                         else:
                             melding = data["message"]
                             dm = data["dm"]
@@ -79,6 +86,11 @@ def chat_server():
                         # remove the socket that's broken    
                         if sock in SOCKET_LIST:
                             SOCKET_LIST.remove(sock)
+
+                        if sock in connectedUser[0]:
+                                    remObject = [i for i in connectedUser if i[0] == sock]
+                                    remObject = remObject[0]
+                                    connectedUser.remove(remObject)
 
                         # at this stage, no data means probably the connection has been broken
                         broadcast(server_socket,sock,"Client (%s, %s) is offline\n" % addr) 
