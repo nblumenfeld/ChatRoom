@@ -13,7 +13,7 @@ connectedUser = []
 maxUsers = 10
 
 def chat_server():
-
+    
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((HOST, PORT))
@@ -37,6 +37,7 @@ def chat_server():
             if sock == server_socket: 
                 sockfd, addr = server_socket.accept()
                 SOCKET_LIST.append(sockfd)
+                connectedUser.append((sock,None))
 
                 # >> This is only server side
                 # print "Client (%s, %s) connected" % addr
@@ -57,12 +58,15 @@ def chat_server():
                         # Data is a json object
 
                         data = json.loads(data)
-                        
+
+                        print data["message"] 
+
+                        # if socekt is in the connectedUser but with (sock, None) then we add the username
                         # look through the json object to figure out if it is a message or a connection.
                         if("username" in data):
                             connectedUser.append((sock,data["username"]))
                             sock.send(json.dumps({"isConnected":True}))
-                            broadcast(server_socket,sock,"User %s has connected\n" %data["username"])
+                            broadcast(server_socket,sock,data["sender"],"User has connected")
                         elif("disconect" in data):
                             if data["disconnect"] == True:
                                 sock.send(json.dumps({"isConnected":True}))
@@ -75,11 +79,12 @@ def chat_server():
                         else:
                             melding = data["message"]
                             dm = data["dm"]
+                            sender = data["sender"]
 
                             if dm == None:
-                                broadcast(server_socket,sock,melding)
+                                broadcast(server_socket,sock,sender,melding)
                             else:
-                                privatMessage(server_socket,sock,melding,dm)
+                                privatMessage(server_socket,sock,sender,melding,dm)
                                 
 
                     else:
@@ -93,17 +98,17 @@ def chat_server():
                                     connectedUser.remove(remObject)
 
                         # at this stage, no data means probably the connection has been broken
-                        broadcast(server_socket,sock,"Client (%s, %s) is offline\n" % addr) 
+                        broadcast(server_socket,sock,None,"Client (%s, %s) is offline\n" % addr) 
 
                 # exception 
                 except:
                     
-                    broadcast(server_socket, sock,"Client (%s, %s) is offline\n" % addr)
+                    broadcast(server_socket, sock, None,"Client (%s, %s) is offline\n" % addr)
                     continue
 
     server_socket.close()
 
-def privatMessage (server_socket, sock, message, dmUser):
+def privatMessage (server_socket, sock, sender, message, dmUser):
     if dmUser in connectedUser[0]:
         dmSocket = [i for i in connectedUser if i[0] == dmUser]
         dmSocket = dmSocket[0]
@@ -115,7 +120,7 @@ def privatMessage (server_socket, sock, message, dmUser):
             # send the message only to peer
             if socket == dmSocket:
                 try :
-                    socket.send(json.dumps({"dm":dmUser, "message":message, "length":len(message), "date":str(now)}))
+                    socket.send(json.dumps({"dm":dmUser, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
                 except :
                     # broken socket connection
                     socket.close()
@@ -130,7 +135,7 @@ def privatMessage (server_socket, sock, message, dmUser):
                     
 
 # broadcast chat messages to all connected clients
-def broadcast (server_socket, sock, message):
+def broadcast (server_socket, sock, sender, message):
     
     now =  datetime.datetime.now()
 
@@ -138,7 +143,7 @@ def broadcast (server_socket, sock, message):
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
-                socket.send(json.dumps({"dm":None, "message":message, "length":len(message), "date":str(now)}))
+                socket.send(json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)}))
             except :
                 # broken socket connection
                 socket.close()
