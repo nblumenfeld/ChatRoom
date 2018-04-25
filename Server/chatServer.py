@@ -45,6 +45,7 @@ def chat_server():
                 # add the user to connectedUser but with no username
                 connectedUser.append((sock,None))
 
+                print "This is the socet that connected: %s" %sock
             # a message from a client, not a new connection
             else:
 
