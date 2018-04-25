@@ -4,50 +4,69 @@ import select
 import sys
 import json
 from Tkinter import *
+from threading import Thread
+
+username = None
+
+"""handles recieving of messages"""
+def receive():
+    while True:
+        try:
+            jsonMessage = socks.recv(2048)
+            data = json.loads(jsonMessage)
+            messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
+        except OSError:
+            break
+
+"""sends user messages to the server"""
+def send(event):
+    input_get = input_field.get()
+    messages.insert(END, "%s: %s\n" % (username, input_get))    
+    server.send(json.dumps({'message':input_get}))
+    input_user.set('')
+    return "break"
+
+# def on_closing():
+
+# def username_popup():
+#     win = TopLevel()
+#     win.wm_title("Enter a username")
+
+#     l = Label(win, text="Input")
+#     l.grid(row=0, column=0)
+
+#     b = Button(win, text="Okay", command=win.destroy)
+#     b.grid(row=1, column=0)
+
+
+window = Tk()
+window.title("T1P Chat Room")
+frame = Frame(window)
+scrollbar= Scrollbar(frame)
+
+# enter_username = Button(frame, height=5, width=10, command=enter_username)
+
+
+messages = Listbox(frame,height=15, width=50, yscrollcommand=scrollbar.set)
+scrollbar.pack(side=RIGHT, fill=Y)
+messages.pack(side=LEFT, fill=BOTH)
+messages.pack()
+
+frame.pack()
+
+input_user = StringVar()
+input_field = Entry(window, text=input_user)
+input_field.pack(side=BOTTOM, fill=X)
+
+input_field.bind("<Return>", send)
+frame.pack()
+
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(('localhost',1134))
 server.send(json.dumps({'username':'testUser'}))
 
-## Everything below this can be commented out if you just want to test the initial connection protocol
+receive_thread = Thread(target=receive)
+receive_thread.start()
 
-window = Tk()
-messages = Text(window)
-messages.pack()
-input_user = StringVar()
-input_field = Entry(window, text=input_user)
-input_field.pack(side=BOTTOM, fill=X)
-
-def Enter_pressed(event):
-    input_get = input_field.get()
-    server.send(json.dumps({'message':input_get}))    
-    input_user.set('')
-    return "break"
-
-frame = Frame(window)  # , width=300, height=300)
-input_field.bind("<Return>", Enter_pressed)
-frame.pack()
-
-window.mainloop()
-
-
-
-
-
-
-while True:
-    sockets_list = [sys.stdin, server]
-
-    read_sockets,write_socket, error_socket = select.select(sockets_list,[],[])
-
-    for socks in read_sockets:
-        if socks == server:
-            jsonMessage = socks.recv(2048)
-            data = json.loads(jsonMessage)
-            print(data["message"])
-        else:
-            message = sys.stdin.readline()
-            server.send(json.dumps({'message':message}))
-            sys.stdout.flush()
-
-server.close()
+mainloop() # Starts the GUI execution
