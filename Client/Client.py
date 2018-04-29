@@ -14,6 +14,7 @@ def receive():
         try:
             jsonMessage = server.recv(2048)
             data = json.loads(jsonMessage)
+            print data
             messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
         except OSError:
             break
@@ -21,8 +22,10 @@ def receive():
 """sends user messages to the server"""
 def send(event):
     input_get = input_field.get()
-    messages.insert(END, "%s: %s\n" % (username, input_get))    
-    server.send(json.dumps({'message':input_get}))
+    messages.insert(END, "%s: %s\n" % (username, input_get))   
+    messageToSend = json.dumps({'message':input_get}) 
+    print messageToSend
+    server.send(json.dumps({'message':input_get, 'sender':username, 'date':'', 'dm':'Noah','length':len(input_get)}))
     input_user.set('')
     return "break"
 
