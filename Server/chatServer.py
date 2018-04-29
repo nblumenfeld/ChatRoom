@@ -124,10 +124,8 @@ def chat_server():
     server_socket.close()
 
 def privatMessage (server_socket, sock, sender, message, dmUser):
-    
-    print connectedUser
 
-    dmSocket = [i for i in connectedUser if i[0] == dmUser]
+    dmSocket = [i for i in connectedUser if i[1] == dmUser]
     dmSocket = dmSocket[0]
     dmSocket = dmSocket[0] #getting the socket
 
