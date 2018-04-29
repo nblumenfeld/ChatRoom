@@ -102,6 +102,7 @@ def chat_server():
                                 dm = data["dm"]
                                 sender = data["sender"]
 
+
                                 if dm == None:
                                     broadcast(server_socket,sock,sender,melding)
                                 else:
@@ -123,23 +124,25 @@ def chat_server():
     server_socket.close()
 
 def privatMessage (server_socket, sock, sender, message, dmUser):
-    if dmUser in connectedUser[0]:
-        dmSocket = [i for i in connectedUser if i[0] == dmUser]
-        dmSocket = dmSocket[0]
-        dmSocket = dmSocket[0] #getting the socket
+    
+    print connectedUser
 
-        now =  datetime.datetime.now()
-        
-        for socket in SOCKET_LIST:
-            # send the message only to peer
-            if socket == dmSocket:
-                try :
-                    socket.send(json.dumps({"dm":dmUser, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
-                except :
-                    # broken socket connection
-                    socket.close()
-                    # broken socket, remove it
-                    slettTing (socket)
+    dmSocket = [i for i in connectedUser if i[0] == dmUser]
+    dmSocket = dmSocket[0]
+    dmSocket = dmSocket[0] #getting the socket
+
+    now =  datetime.datetime.now()
+    
+    for socket in SOCKET_LIST:
+        # send the message only to peer
+        if socket == dmSocket:
+            try :
+                socket.send(json.dumps({"dm":dmUser, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
+            except :
+                # broken socket connection
+                socket.close()
+                # broken socket, remove it
+                slettTing (socket)
                     
 
 # broadcast chat messages to all connected clients
