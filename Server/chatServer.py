@@ -72,6 +72,7 @@ def chat_server():
                                 #there was no equel username 
                                 connectedUser.append((sock,data["username"]))
                                 sock.send(json.dumps({"isConnected":True, "errorCode":-1}))
+                                
                                 broadcast(server_socket,sock,data["username"],"User has connected")
                             else:
                                 # someone have the username already
@@ -123,9 +124,9 @@ def chat_server():
 
     server_socket.close()
 
-def privatMessage (server_socket, sock, sender, message, dmUser):
+def privatMessage (server_socket, sock, sender, message, dm):
 
-    dmSocket = [i for i in connectedUser if i[1] == dmUser]
+    dmSocket = [i for i in connectedUser if i[1] == dm]
     dmSocket = dmSocket[0]
     dmSocket = dmSocket[0] #getting the socket
 
@@ -135,7 +136,7 @@ def privatMessage (server_socket, sock, sender, message, dmUser):
         # send the message only to peer
         if socket == dmSocket:
             try :
-                socket.send(json.dumps({"dm":dmUser, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
+                socket.send(json.dumps({"dm":dm, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
             except :
                 # broken socket connection
                 socket.close()
