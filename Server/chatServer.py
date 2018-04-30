@@ -44,25 +44,36 @@ def chat_server():
                 SOCKET_LIST.append(sockfd)
                 # add the user to connectedUser but with no username
                 connectedUser.append((sock,None))
+                print connectedUser
 
                 print "This is the socet that connected: %s" %sock
             # a message from a client, not a new connection
             else:
-
                 # process data recieved from client, 
                 try:
                     # receiving data from the socket.
                     data = sock.recv(RECV_BUFFER)
+                    
+
                     if data:
                         # there is something in the socket
                         # Data is a json object
 
                         data = json.loads(data)
-
+                        
+                        
                         # if socekt is in the connectedUser but with (sock, None) then we check if there is a user with the same name or disconect them
-                        remObject = [i for i in connectedUser if i[0] == sock]
-                        remObject = remObject[0]
+                        # Causing problems
+                        # remObject = [i for i in connectedUser if i[0] == sock]
+                        
+                        # print connectedUser + "Im getting this biches"
+                        # print sock + " Does this work man"
+
+                        remObject = ("123123123", "Thomas")
+                        print remObject
+                        
                         if(remObject[1] == None):
+
                             # there is no username so look for username
                             connectedUser.remove(remObject)
                             currUsername = data["username"]
@@ -100,9 +111,11 @@ def chat_server():
                                     sock.close()
                             else:
                                 melding = data["message"]
-                                dm = data["dm"]
+                                # dm = data["dm"]
                                 sender = data["sender"]
 
+                                dm = None
+                                # we do get in here
 
                                 if dm == None:
                                     broadcast(server_socket,sock,sender,melding)
@@ -114,11 +127,12 @@ def chat_server():
                         slettTing(sock)
 
                         # at this stage, no data means probably the connection has been broken
+                        print "Else problem check if"
                         broadcast(server_socket,sock,None,"Client (%s, %s) is offline\n" % addr) 
 
                 # exception 
                 except:
-                    
+                    print "Try problem, check Try"
                     broadcast(server_socket, sock, None,"Client (%s, %s) is offline\n" % addr)
                     continue
 
@@ -146,7 +160,6 @@ def privatMessage (server_socket, sock, sender, message, dm):
 
 # broadcast chat messages to all connected clients
 def broadcast (server_socket, sock, sender, message):
-    
     now =  datetime.datetime.now()
 
     for socket in SOCKET_LIST:

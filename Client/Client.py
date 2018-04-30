@@ -25,7 +25,7 @@ def send(event):
     messages.insert(END, "%s: %s\n" % (username, input_get))   
     messageToSend = json.dumps({'message':input_get}) 
     print messageToSend
-    server.send(json.dumps({'message':input_get, 'sender':username, 'date':'', 'dm':'Noah','length':len(input_get)}))
+    server.send(json.dumps({'message':input_get, 'sender':username}))
     input_user.set('')
     return "break"
 
@@ -53,7 +53,7 @@ frame.pack()
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(('localhost',1134))
-server.send(json.dumps({'username':username}))
+# server.send(json.dumps({'username':username}))
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
