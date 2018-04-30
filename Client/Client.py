@@ -27,8 +27,10 @@ def receive():
             while True:
                 try:
                     jsonMessage = server.recv(2048)
-                    print jsonMessage
                     data = json.loads(jsonMessage)
+                    print data
+                    if('disconnect' in data):
+                        window.destroy()
                     if(data['dm'] == username):
                         messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
                     else:
