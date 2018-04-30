@@ -79,7 +79,7 @@ frame.pack()
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server.connect(('146.86.79.208',1134))
 server.connect(('localhost',1134))
-server.send({'username':username})
+server.send(jsson.dumps({'username':username}))
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
