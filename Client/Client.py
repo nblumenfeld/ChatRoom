@@ -7,6 +7,7 @@ from Tkinter import *
 from threading import Thread
 
 username = sys.argv[1]
+dm = None
 
 """handles recieving of messages"""
 def receive():
@@ -14,20 +15,29 @@ def receive():
         try:
             jsonMessage = server.recv(2048)
             data = json.loads(jsonMessage)
-            print data
-            messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
+            if(data['dm'] == username):
+                messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
+            else:
+                messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
         except OSError:
             break
 
 """sends user messages to the server"""
 def send(event):
     input_get = input_field.get()
-    messages.insert(END, "%s: %s\n" % (username, input_get))   
+    dm = inputDM.get()
+    messages.insert(END, "You: %s\n" %  input_get)   
     messageToSend = json.dumps({'message':input_get}) 
-    print messageToSend
-    server.send(json.dumps({'message':input_get, 'sender':username}))
+    if dm == '':
+        print 'Sending without DM'
+        server.send(json.dumps({'message':input_get, 'sender':username}))
+    else:
+        server.send(json.dumps({'message':input_get, 'sender':username, 'dm':dm}))
     input_user.set('')
     return "break"
+
+def disconnect():
+    server.send(json.dumps({'disconnect':True,'sender':username}))
 
 
 window = Tk()
@@ -43,17 +53,31 @@ messages.pack()
 
 frame.pack()
 
+labelDMText=StringVar()
+labelDMText.set("DM:")
+labelDM = Label(window, textvariable=labelDMText)
+inputDM = StringVar()
+inputDMField = Entry(window, textvariable=inputDM)
+labelDM.pack(side=LEFT)
+inputDMField.pack(side=LEFT)
+
+messageLabelText = StringVar()
+messageLabelText.set("Message:")
+messageLabel = Label(window, textvariable=messageLabelText)
 input_user = StringVar()
-input_field = Entry(window, text=input_user)
-input_field.pack(side=BOTTOM, fill=X)
+input_field = Entry(window, textvariable=input_user)
+messageLabel.pack(side=LEFT)
+input_field.pack(side=LEFT)
 
 input_field.bind("<Return>", send)
+
+disconnectButton = Button(window, text="Disconnect", command=disconnect)
+disconnectButton.pack(side=BOTTOM)
 frame.pack()
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(('localhost',1134))
-# server.send(json.dumps({'username':username}))
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
