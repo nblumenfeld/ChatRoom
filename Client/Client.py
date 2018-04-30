@@ -9,18 +9,33 @@ from threading import Thread
 username = sys.argv[1]
 dm = None
 
-"""handles recieving of messages"""
+"""handles recieving of messages in its own thread"""
 def receive():
+    isConnected = False
     while True:
-        try:
-            jsonMessage = server.recv(2048)
-            data = json.loads(jsonMessage)
-            if(data['dm'] == username):
-                messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
-            else:
-                messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
-        except OSError:
-            break
+        if(isConnected == False):
+            while not isConnected:
+                try:
+                    jsonMessage = server.recv(2048)
+                    print jsonMessage
+                    data = json.loads(jsonMessage)
+                    if(data["isConnected"] == True):
+                        isConnected = True
+                except OSError:
+                    break
+        else:
+            while True:
+                try:
+                    jsonMessage = server.recv(2048)
+                    print jsonMessage
+                    data = json.loads(jsonMessage)
+                    if(data['dm'] == username):
+                        messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
+                    else:
+                        messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
+                except OSError:
+                    break
+
 
 """sends user messages to the server"""
 def send(event):
@@ -75,14 +90,17 @@ disconnectButton = Button(window, text="Disconnect", command=disconnect)
 disconnectButton.pack(side=BOTTOM)
 frame.pack()
 
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server.connect(('146.86.79.208',1134))
-server.connect(('localhost',1134))
-server.send(json.dumps({'username':username}))
+server.connect(('146.86.79.208',1134))
+print server
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
+
+# server.connect(('localhost',1134))
+server.send(json.dumps({'username':username}))
+
+
 
 
 mainloop() # Starts the GUI execution
