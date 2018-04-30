@@ -15,7 +15,7 @@ def receive():
         try:
             jsonMessage = server.recv(2048)
             data = json.loads(jsonMessage)
-            if(data['dm'] == username):
+            if(data['dm'] == username or data['dm'] == None):
                 messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
             else:
                 messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
@@ -79,7 +79,7 @@ frame.pack()
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server.connect(('146.86.79.208',1134))
 server.connect(('localhost',1134))
-server.send(jsson.dumps({'username':username}))
+server.send(json.dumps({'username':username}))
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
