@@ -30,7 +30,7 @@ def send(event):
     messageToSend = json.dumps({'message':input_get}) 
     if dm == '':
         print 'Sending without DM'
-        server.send(json.dumps({'message':input_get, 'sender':username}))
+        server.send(json.dumps({'message':input_get, 'sender':username, 'dm':None}))
     else:
         server.send(json.dumps({'message':input_get, 'sender':username, 'dm':dm}))
     input_user.set('')
@@ -77,7 +77,9 @@ frame.pack()
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# server.connect(('146.86.79.208',1134))
 server.connect(('localhost',1134))
+server.send({'username':username})
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
