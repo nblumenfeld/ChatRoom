@@ -17,10 +17,15 @@ def receive():
             while not isConnected:
                 try:
                     jsonMessage = server.recv(2048)
-                    print jsonMessage
                     data = json.loads(jsonMessage)
                     if(data["isConnected"] == True):
                         isConnected = True
+                    else if(data['errorCode'] == 1):
+                        messages.insert(END, 'Username taken')
+                        window.destroy()
+                    else if(data['errorCode'] == 2):
+                        messages.insert(END, 'Too many kooks')
+                        window.destroy()
                 except OSError:
                     break
         else:
@@ -28,7 +33,6 @@ def receive():
                 try:
                     jsonMessage = server.recv(2048)
                     data = json.loads(jsonMessage)
-                    print data
                     if('disconnect' in data):
                         window.destroy()
                     if(data['dm'] == username):
