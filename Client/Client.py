@@ -35,8 +35,9 @@ def receive():
                     data = json.loads(jsonMessage)
                     if('disconnect' in data):
                         window.destroy()
-                    if(data['dm'] == username):
-                        messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
+                    if('dm' in data):
+                        if(data['dm'] == username):
+                            messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
                     else:
                         messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
                 except OSError:
