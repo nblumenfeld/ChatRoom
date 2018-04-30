@@ -15,7 +15,7 @@ def receive():
         try:
             jsonMessage = server.recv(2048)
             data = json.loads(jsonMessage)
-            if(data['dm'] == username or data['dm'] == None):
+            if(data['dm'] == username):
                 messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
             else:
                 messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
