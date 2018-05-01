@@ -25,10 +25,12 @@ def receive():
                         print 'Username was taken'
                         time.sleep(3)
                         window.destroy()
+                        break
                     elif(data['errorCode'] == 2):
                         print 'Too many kooks'
                         time.sleep(3)
                         window.destroy()
+                        break
                 except OSError:
                     break
         else:
@@ -102,11 +104,11 @@ frame.pack()
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(('146.86.79.208',1134))
+# server.connect(('localhost',1134))
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
 
-# server.connect(('localhost',1134))
 server.send(json.dumps({'username':username}))
 
 
