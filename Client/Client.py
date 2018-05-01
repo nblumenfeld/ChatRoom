@@ -21,10 +21,10 @@ def receive():
                     if(data["isConnected"] == True):
                         isConnected = True
                     elif(data['errorCode'] == 1):
-                        messages.insert(END, 'Username taken')
+                        print 'Username was taken'
                         window.destroy()
                     elif(data['errorCode'] == 2):
-                        messages.insert(END, 'Too many kooks')
+                        print 'Too many kooks'
                         window.destroy()
                 except OSError:
                     break
