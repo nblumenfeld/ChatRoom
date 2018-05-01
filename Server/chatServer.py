@@ -121,11 +121,14 @@ def chat_server():
                                     sender = data["sender"]
                                     sock.send(json.dumps({"disconnect":True}))
 
-                                    broadcast(server_socket,sock,sender, sender + " is offline\n")
                                     
-                                    # remove from usernameList
-                                    sock.close()
                                     slettTing(sock)
+                                    broadcast(server_socket,sock,sender, sender + " is offline\n")
+                                    sock.close()
+                                    
+                                    print "after brodcast"
+                                    print connectedUser
+                        
 
                             else:
                                 print "Server recieved a regular message\n"
