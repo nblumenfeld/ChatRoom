@@ -22,9 +22,11 @@ def receive():
                         isConnected = True
                     elif(data['errorCode'] == 1):
                         print 'Username was taken'
+                        time.sleep(3)
                         window.destroy()
                     elif(data['errorCode'] == 2):
                         print 'Too many kooks'
+                        time.sleep(3)
                         window.destroy()
                 except OSError:
                     break
@@ -99,7 +101,6 @@ frame.pack()
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(('146.86.79.208',1134))
-print server
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
