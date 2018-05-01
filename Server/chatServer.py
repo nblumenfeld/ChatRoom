@@ -139,7 +139,7 @@ def chat_server():
                                 
                     else:
                         # remove the socket that's broken    
-                        slettTing(sock)
+                        #slettTing(sock)
                         sock.close()
                         # at this stage, no data means probably the connection has been broken
                         print "Else problem check if"
@@ -147,7 +147,7 @@ def chat_server():
 
                 # exception 
                 except:
-                    print "Try problem, check Try"
+                    print "Try problem, what is happening in try"
                     #broadcast(server_socket, sock, None,"Client (%s, %s) is offline\n" % addr)
                     continue
 
@@ -176,16 +176,18 @@ def privatMessage (server_socket, sock, sender, message, dm):
 
 # broadcast chat messages to all connected clients
 def broadcast (server_socket, sock, sender, message):
+    
     now =  datetime.datetime.now()
 
     #print sock
 
     for socket in SOCKET_LIST:
         # send the message only to peer
-        if socket != server_socket and socket != sock :
+        if socket != server_socket: # and socket != sock :
             try :
                 #jsonThing = json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)})
                 
+                print "Heloo"
                 socket.send(json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)}))
               
 
