@@ -12,9 +12,10 @@ PORT = 1134
 # a list of tuples with socetfd and username
 connectedUser = []
 
-
 # a error code list
 errors = [1, 2]
+# 1 is for username exist alread
+# 2 is for IF the server have a maxnumber of users
 
 
 def chat_server():
@@ -43,15 +44,15 @@ def chat_server():
                 sockfd, addr = server_socket.accept()
                 SOCKET_LIST.append(sockfd)
                 # add the user to connectedUser but with no username
-                connectedUser.append((sock,None))
-                print connectedUser
+                connectedUser.append((sockfd,None))
+                #print connectedUser
 
-                print "This is the socet that connected: %s" %sock
+                print "This is the socet that connected: %s" %sockfd
             # a message from a client, not a new connection
             else:
                 # process data recieved from client, 
+                
                 try:
-                    # receiving data from the socket.
                     data = sock.recv(RECV_BUFFER)
                     
 
@@ -61,61 +62,75 @@ def chat_server():
 
                         data = json.loads(data)
                         
-                        
                         # if socekt is in the connectedUser but with (sock, None) then we check if there is a user with the same name or disconect them
                         # Causing problems
-                        # remObject = [i for i in connectedUser if i[0] == sock]
-                        
-                        # print connectedUser + "Im getting this biches"
-                        # print sock + " Does this work man"
+                        tempSock = sock
 
-                        remObject = ("123123123", "Thomas")
-                        print remObject
-                        
+                        remObject = [i for i in connectedUser if i[0] == tempSock]
+                        remObject = remObject[0]
+
+                        # print remObject
+
+                        # remObject =  remObject[1]
+                        # print remObject
+
+                        if remObject[1] == None:
+                            print "Yay"
+
                         if(remObject[1] == None):
-
+                                
                             # there is no username so look for username
                             connectedUser.remove(remObject)
+                            #with one user connected user is now empty
                             currUsername = data["username"]
+                            print currUsername
                             # see if there is another username in the list of usernames
-                            userExist = [i for i in connectedUser[1] if i[1] == currUsername] 
+                            userExist = [i for i in connectedUser if i[1] == currUsername] 
+                            
                             if not userExist:
                                 #there was no equel username 
-                                connectedUser.append((sock,data["username"]))
-                                sock.send(json.dumps({"isConnected":True, "errorCode":-1}))
+                                connectedUser.append((sock,currUsername))
                                 
-                                broadcast(server_socket,sock,data["username"],"User has connected")
+                                sock.send(json.dumps({"isConnected":True, "errorCode":-1}))
+                                print connectedUser
+                                broadcast(server_socket,sock,currUsername,"User has connected")
                             else:
                                 # someone have the username already
                                 # disconect them and send an error message
                                 sock.send(json.dumps({"isConnected":False, "errorCode":errors[0]}))
-                                if sock in SOCKET_LIST:
-                                    SOCKET_LIST.remove(sock)
+                                
+                                if socket in SOCKET_LIST:
+                                    SOCKET_LIST.remove(socket) 
 
-                                if sock in connectedUser[0]:
-                                    remObject = [i for i in connectedUser if i[0] == sock]
-                                    remObject = remObject[0]
-                                    connectedUser.remove(remObject)
+                                print connectedUser
+                                
+                                sock.close
 
                         else: 
                             # the client already in the list
                             # we are asuming wellbehave clients
-                            if("disconect" in data):
-                                if data["disconnect"] == True:
-                                    sock.send(json.dumps({"disconnect":True}))
-                                    # remove from usernameList
-                                    if sock in connectedUser[0]:
-                                        remObject = [i for i in connectedUser if i[0] == sock]
-                                        remObject = remObject[0]
-                                        connectedUser.remove(remObject)
-                                    sock.close()
-                            else:
-                                melding = data["message"]
-                                # dm = data["dm"]
-                                sender = data["sender"]
+                            
+                            if("disconnect" in data):
 
-                                dm = None
-                                # we do get in here
+                                if data["disconnect"] == True:
+                                    
+                                    sender = data["sender"]
+
+                                    sock.send(json.dumps({"disconnect":True}))
+
+                                    broadcast(server_socket,sock,sender, sender + " is offline\n")
+                                    
+                                    # remove from usernameList
+                                    
+                                    sock.close()
+                                    slettTing(sock)
+
+                                    
+                            else:
+
+                                melding = data["message"]
+                                dm = data["dm"]
+                                sender = data["sender"]
 
                                 if dm == None:
                                     broadcast(server_socket,sock,sender,melding)
@@ -125,7 +140,7 @@ def chat_server():
                     else:
                         # remove the socket that's broken    
                         slettTing(sock)
-
+                        sock.close()
                         # at this stage, no data means probably the connection has been broken
                         print "Else problem check if"
                         broadcast(server_socket,sock,None,"Client (%s, %s) is offline\n" % addr) 
@@ -133,7 +148,7 @@ def chat_server():
                 # exception 
                 except:
                     print "Try problem, check Try"
-                    broadcast(server_socket, sock, None,"Client (%s, %s) is offline\n" % addr)
+                    #broadcast(server_socket, sock, None,"Client (%s, %s) is offline\n" % addr)
                     continue
 
     server_socket.close()
@@ -141,33 +156,41 @@ def chat_server():
 def privatMessage (server_socket, sock, sender, message, dm):
 
     dmSocket = [i for i in connectedUser if i[1] == dm]
-    dmSocket = dmSocket[0]
-    dmSocket = dmSocket[0] #getting the socket
+    if dmSocket:
+        dmSocket = dmSocket[0]
+        dmSocket = dmSocket[0] #getting the socket
 
-    now =  datetime.datetime.now()
-    
-    for socket in SOCKET_LIST:
-        # send the message only to peer
-        if socket == dmSocket:
-            try :
-                socket.send(json.dumps({"dm":dm, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
-            except :
-                # broken socket connection
-                socket.close()
-                # broken socket, remove it
-                slettTing (socket)
+        now =  datetime.datetime.now()
+        
+        for socket in SOCKET_LIST:
+            # send the message only to peer
+            if socket == dmSocket:
+                try :
+                    socket.send(json.dumps({"dm":dm, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
+                except :
+                    # broken socket connection
+                    socket.close()
+                    # broken socket, remove it
+                    slettTing (socket)
                     
 
 # broadcast chat messages to all connected clients
 def broadcast (server_socket, sock, sender, message):
     now =  datetime.datetime.now()
 
+    #print sock
+
     for socket in SOCKET_LIST:
         # send the message only to peer
         if socket != server_socket and socket != sock :
             try :
+                #jsonThing = json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)})
+                
                 socket.send(json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)}))
+              
+
             except :
+                print "exception for brodcast"
                 # broken socket connection
                 socket.close()
                 # broken socket, remove it
@@ -182,6 +205,7 @@ def slettTing (socket):
         remObject = [i for i in connectedUser if i[0] == socket]
         remObject = remObject[0]
         connectedUser.remove(remObject)
+        print connectedUser
 
 if __name__ == "__main__":
  
