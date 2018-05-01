@@ -18,31 +18,24 @@ def receive():
             while not isConnected:
                 try:
                     jsonMessage = server.recv(2048)
+                    print jsonMessage
                     data = json.loads(jsonMessage)
                     if(data["isConnected"] == True):
                         isConnected = True
-                    elif(data['errorCode'] == 1):
-                        print 'Username was taken'
-                        time.sleep(3)
-                        window.destroy()
-                        break
-                    elif(data['errorCode'] == 2):
-                        print 'Too many kooks'
-                        time.sleep(3)
-                        window.destroy()
-                        break
                 except OSError:
                     break
         else:
             while True:
                 try:
                     jsonMessage = server.recv(2048)
+                    print jsonMessage
                     data = json.loads(jsonMessage)
-                    if('disconnect' in data):
-                        window.destroy()
-                    if('dm' in data):
-                        if(data['dm'] == username):
-                            messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
+                    print data
+                    # if('disconnect' in data):
+                    #     window.destroy()
+                    
+                    if(data['dm'] == username):
+                        messages.insert(END, 'DIRECT MESSAGE!!! %s: %s' %(data["sender"], data["message"]))
                     else:
                         messages.insert(END,"%s: %s\n" % (data["sender"], data["message"]))
                 except OSError:
@@ -54,7 +47,7 @@ def send(event):
     input_get = input_field.get()
     dm = inputDM.get()
     messages.insert(END, "You: %s\n" %  input_get)   
-    messageToSend = json.dumps({'message':input_get}) 
+    #messageToSend = json.dumps({'message':input_get}) 
     if dm == '':
         print 'Sending without DM'
         server.send(json.dumps({'message':input_get, 'sender':username, 'dm':None}))
