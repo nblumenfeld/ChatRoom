@@ -134,6 +134,7 @@ def chat_server():
                                 sender = data["sender"]
 
                                 if dm == None:
+                                    print "They are trying to send a regular message\n"
                                     broadcast(server_socket,sock,sender,melding)
                                 else:
                                     privatMessage(server_socket,sock,sender,melding,dm)
@@ -167,7 +168,7 @@ def privatMessage (server_socket, sock, sender, message, dm):
         
         for socket in SOCKET_LIST:
             # send the message only to peer
-            if socket == dmSocket:
+            if socket == dmSocket and socket != sock:
                 try :
                     socket.send(json.dumps({"dm":dm, "sender":sender, "message":message, "length":len(message), "date":str(now)}))
                 except :
@@ -179,8 +180,6 @@ def privatMessage (server_socket, sock, sender, message, dm):
 
 # broadcast chat messages to all connected clients
 def broadcast (server_socket, sock, sender, message):
-    
-    print "They are trying to send a regular message\n"
 
     now =  datetime.datetime.now()
 
@@ -188,7 +187,7 @@ def broadcast (server_socket, sock, sender, message):
 
     for socket in SOCKET_LIST:
         # send the message only to peer
-        if socket != server_socket: # and socket != sock :
+        if socket != server_socket and socket != sock :
             try :
                 jsonThing = json.dumps({"dm":None,"sender":sender, "message":message, "length":len(message), "date":str(now)})
                 
