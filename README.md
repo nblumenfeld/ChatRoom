@@ -15,7 +15,9 @@ Private Messaging has been implemented
 
 Server:
     Run the server from the command line using python:
+        ```
         python chatServer.py
+        ```
 
     The Server has 4 methods.
         def chat_server():
@@ -57,8 +59,10 @@ Server:
 
 
 Client:
-    Run the client from the command line using python with username as first and only argument
+    Run the client from the command line using python with username as first and only argument:
+        ```
         python Client.py <Username>
+        ```
     
     The client is using a Tkinter python Graphical User Interface
      
