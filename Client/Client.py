@@ -20,10 +20,10 @@ def receive():
                     data = json.loads(jsonMessage)
                     if(data["isConnected"] == True):
                         isConnected = True
-                    else if(data['errorCode'] == 1):
+                    elif(data['errorCode'] == 1):
                         messages.insert(END, 'Username taken')
                         window.destroy()
-                    else if(data['errorCode'] == 2):
+                    elif(data['errorCode'] == 2):
                         messages.insert(END, 'Too many kooks')
                         window.destroy()
                 except OSError:
