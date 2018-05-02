@@ -70,8 +70,8 @@ def chat_server():
                         remObject = [i for i in connectedUser if i[0] == tempSock]
                         remObject = remObject[0]
 
-                        if remObject[1] == None:
-                            print "Yay"
+                        #if remObject[1] == None:
+                        #   print "Yay"
 
                         if(remObject[1] == None):
                                 
@@ -147,7 +147,7 @@ def chat_server():
                         #slettTing(sock)
                         sock.close()
                         # at this stage, no data means probably the connection has been broken
-                        print "Else problem check if else loop for if there is data"
+                        print "Else problem check if/else"
                         #broadcast(server_socket,sock,None,"Client (%s, %s) is offline\n" % addr) 
 
                 # exception 

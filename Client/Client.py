@@ -96,7 +96,9 @@ disconnectButton.pack(side=BOTTOM)
 frame.pack()
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.connect(('146.86.79.208',1134))
+server.connect(('yetti.hopto.org',1134))        # AJ
+# server.connect(('146.86.79.214',1134))        # Camden
+# server.connect(('146.86.79.208',1134))        # THOMAS
 # server.connect(('localhost',1134))
 
 receive_thread = Thread(target=receive)
